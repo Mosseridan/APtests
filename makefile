@@ -1,0 +1,23 @@
+all: mat_mul mat_mul_with_function_calls mat_mul_with_function_calls2 mat_mul_with_function_calls3 mat_mul_with_function_calls4
+
+mat_mul: mat_mul.c
+	gcc -o mat_mul mat_mul.c
+
+
+mat_mul_with_function_calls: mat_mul_with_function_calls.c
+	gcc -o mat_mul_with_function_calls mat_mul_with_function_calls.c
+
+
+mat_mul_with_function_calls2: mat_mul_with_function_calls2.c
+	gcc -o mat_mul_with_function_calls2 mat_mul_with_function_calls2.c
+
+
+mat_mul_with_function_calls3: mat_mul_with_function_calls3.c
+	gcc -o mat_mul_with_function_calls3 mat_mul_with_function_calls3.c
+
+
+mat_mul_with_function_calls4: mat_mul_with_function_calls4.c
+	gcc -o mat_mul_with_function_calls4 mat_mul_with_function_calls4.c
+
+clean:
+	rm -rf mat_mul mat_mul_with_function_calls mat_mul_with_function_calls2 mat_mul_with_function_calls3 mat_mul_with_function_calls4
