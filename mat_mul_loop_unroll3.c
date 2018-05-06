@@ -4,20 +4,11 @@
 
 #define N 1000
 
-
-void foo(int i, int j, int** a, int** b, int** c) {
-    int k;
-    for (k = 0; k < N; k++) {
-        c[i][j] += a[i][k] + b[k][j];
-    }
-}
-
-
 int main(int argc, char** argv) {
-    
+
     clock_t begin = clock();
 
-    int i,j;    
+    int i,j,k;    
     int** a = malloc (sizeof(int)*N);  
     int** b = malloc (sizeof(int)*N);  
     int** c = malloc (sizeof(int)*N);  
@@ -47,9 +38,14 @@ int main(int argc, char** argv) {
     clock_t calc_begin = clock();
 
     // compute c = a*b
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < N; j++) {
-            foo(i,j,a,b,c);
+    for (i = 0; i < N-1; i+=2) { // we asume that N is even
+        for (j = 0; j < N-1; j+= 2) { 
+            for (k = 0; k < N-1; k += 2) { 
+                c[i][j] += (a[i][k] * b[k][j] + a[i][k+1] * b[k+1][j]);
+                c[i][j+1] += (a[i][k] * b[k][j+1] + a[i][k+1] * b[k+1][j+1]);
+                c[i+1][j] += (a[i+1][k] * b[k][j] + a[i+1][k+1] * b[k+1][j]);
+                c[i+1][j+1] += (a[i+1][k] * b[k][j+1] + a[i+1][k+1] * b[k+1][j+1]);
+            }
         }
     }
 

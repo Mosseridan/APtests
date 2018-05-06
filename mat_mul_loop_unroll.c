@@ -40,8 +40,8 @@ int main(int argc, char** argv) {
     // compute c = a*b
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
-            for (k = 0; k < N; k++) {
-                c[i][j] += a[i][k] + b[k][j];
+            for (k = 0; k < N-1; k += 2) { // we asume that N is even
+                c[i][j] += (a[i][k] * b[k][j] + a[i][k+1] * b[k+1][j]);
             }
         }
     }
