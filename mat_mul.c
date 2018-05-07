@@ -1,75 +1,153 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <errno.h>
-#include <limits.h>
+#include <mat_mul.h>
 
-int main(int argc, char** argv) {
-
-    char *p;
-    int n = 10000;
-    errno = 0;
-  
-    if (argc >= 2) {
-        long conv = strtol(argv[1], &p, 10);
-        // Check for errors: e.g., the string does not represent an integer
-        // or the integer is larger than int
-         if (errno == 0 && *p == '\0' && conv <= INT_MAX) {
-            n = conv;
-         }
-    }
-
-    printf("n is set to %d\n",n);
-    
-    clock_t begin = clock();
-
-    int i,j,k;    
-    int** a = malloc (sizeof(int)*n);  
-    int** b = malloc (sizeof(int)*n);  
-    int** c = malloc (sizeof(int)*n);  
-    
-    printf("initializeing a and b with pseudo random numbers and c with zeros\n");
-    clock_t init_begin = clock();
-    
-    srand(time(NULL)); // generate rand seed from current time    
-
-    // initialize a and b with pseudo random numbers and c with zeros
+void mat_mul(int n, int** a, int** b, int** c) {  
+    int i,j,k;
     for (i = 0; i < n; i++) {
-        a[i] = malloc(sizeof(int)*n);
-        b[i] = malloc(sizeof(int)*n);
-        c[i] = malloc(sizeof(int)*n);
         for (j = 0; j < n; j++) {
-            a[i][j] = rand();
-            b[i][j] = rand();
             c[i][j] = 0;
-        }
-    }
-
-    clock_t init_end = clock();
-    double init_time_spent = (double)(init_end - init_begin) / CLOCKS_PER_SEC;
-    printf("initialization took %f seconds\n",init_time_spent);
-
-    printf("computing c = a*b\n");
-    clock_t calc_begin = clock();
-
-    // compute c = a*b
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
             for (k = 0; k < n; k++) {
                 c[i][j] += a[i][k] + b[k][j];
             }
         }
     }
+    return;
+}
 
 
-    clock_t calc_end = clock();
-    double calc_time_spent = (double)(calc_end - calc_begin) / CLOCKS_PER_SEC;
-    printf("calculation took %f seconds\n",calc_time_spent);
-    
-    clock_t end = clock();
-    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("program execution took %f seconds\n",time_spent);
-    
-    return 0;
 
+int compute_cijk(int i, int j, int k, int** a, int** b) {
+    return a[i][k] + b[k][j];
+}
+
+
+
+void mat_mul_function_calls(int n, int** a, int** b, int** c) {  
+    int i,j,k;
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            c[i][j] = 0;
+            for (k = 0; k < n; k++) {
+                c[i][j] += compute_cijk(i,j,k,a,b);
+            }
+        }
+    }
+    return;
+}
+
+
+
+void compute_cijk2(int i, int j, int k, int** a, int** b, int** c) {
+     c[i][j] += a[i][k] * b[k][j];
+}
+
+
+
+void mat_mul_function_calls2(int n, int** a, int** b, int** c) {  
+    int i,j,k;
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            c[i][j] = 0;
+            for (k = 0; k < n; k++) {
+                compute_cijk2(i,j,k,a,b,c);
+            }
+        }
+    }
+    return;
+}
+
+
+
+void compute_cij(int i, int j , int n, int** a, int** b, int** c) {
+    int k;
+    c[i][j] = 0;
+    for (k = 0; k < n; k++) {
+        c[i][j] += a[i][k] * b[k][j];
+    }
+}
+
+
+
+void mat_mul_function_calls3(int n, int** a, int** b, int** c) {  
+    int i,j;
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            compute_cij(i,j,n,a,b,c);
+        }
+    }
+    return;
+}
+
+
+
+void compute_ci(int i, int n, int** a, int** b, int** c) {
+    int j,k;
+    for (j = 0; j < n; j++) {
+        c[i][j] = 0;
+        for (k = 0; k < n; k++) {
+            c[i][j] += a[i][k] * b[k][j];
+        }   
+    } 
+}
+
+
+
+void mat_mul_function_calls4(int n, int** a, int** b, int** c) {  
+    int i;
+    for (i = 0; i < n; i++) {
+        compute_ci(i,n,a,b,c);
+    }
+    return;
+}
+
+
+
+void mat_mul_loop_unroll(int n, int** a, int** b, int** c) {  
+    int i,j,k;
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            c[i][j] = 0;
+            for (k = 0; k < n-1; k += 2) { // we asume that n is even
+                c[i][j] += (a[i][k] * b[k][j] + a[i][k+1] * b[k+1][j]);
+            }
+        }
+    }
+    return;
+}
+
+
+
+void mat_mul_loop_unroll2(int n, int** a, int** b, int** c) {  
+    int i,j,k;
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n-1; j+= 2) { // we asume that n is even
+            c[i][j] = 0;
+            c[i][j+1] = 0;
+            for (k = 0; k < n-1; k += 2) { 
+                c[i][j] += (a[i][k] * b[k][j] + a[i][k+1] * b[k+1][j]);
+                c[i][j+1] += (a[i][k] * b[k][j+1] + a[i][k+1] * b[k+1][j+1]);
+            }
+        }
+    }
+    return;
+}
+
+
+
+void mat_mul_loop_unroll3(int n, int** a, int** b, int** c) {  
+    int i,j,k;
+    for (i = 0; i < n-1; i+=2) { // we asume that n is even
+        for (j = 0; j < n-1; j+= 2) {
+            c[i][j] = 0;
+            c[i][j+1] = 0;
+            c[i+1][j] = 0;
+            c[i+1][j+1] = 0;
+            for (k = 0; k < n-1; k += 2) { 
+                c[i][j] += (a[i][k] * b[k][j] + a[i][k+1] * b[k+1][j]);
+                c[i][j+1] += (a[i][k] * b[k][j+1] + a[i][k+1] * b[k+1][j+1]);
+                c[i+1][j] += (a[i+1][k] * b[k][j] + a[i+1][k+1] * b[k+1][j]);
+                c[i+1][j+1] += (a[i+1][k] * b[k][j+1] + a[i+1][k+1] * b[k+1][j+1]);
+            }
+        }
+    }
+    return;
 }
