@@ -5,7 +5,7 @@
 #include <limits.h>
 #include <mat_mul_dyn.h>
 
-#define N_TESTS 8
+#define N_TESTS 12
 #define EPS 0
 
 typedef void (*test_type)(int n,int** a ,int** b,int** c);
@@ -75,7 +75,8 @@ int main(int argc, char** argv) {
     }
 
     printf("n is set to %d\n",n);
-
+    int mat_size_bm =  n*sizeof(int*)+n*n*sizeof(int);
+    printf("each matrix takes %d Bytes\ntotal usage of matrices a,b,c and d is %d Bytes\n",mat_size_bm,4*mat_size_bm);
     // array of tests to be executed
     
     test_type tests[N_TESTS] = { 
@@ -86,7 +87,11 @@ int main(int argc, char** argv) {
         &mat_mul_function_calls4,
         &mat_mul_loop_unroll,
         &mat_mul_loop_unroll2,
-        &mat_mul_loop_unroll3
+        &mat_mul_loop_unroll3,
+        &mat_mul_arr_priv,
+        &mat_mul_arr_priv2,
+        &mat_mul_pointer_alias,
+        &mat_mul_pointer_alias2
     };
 
     const char* test_names[N_TESTS] = { 
@@ -98,6 +103,10 @@ int main(int argc, char** argv) {
         "mat_mul_loop_unroll",
         "mat_mul_loop_unroll2",
         "mat_mul_loop_unroll3",
+        "mat_mul_arr_priv",
+        "mat_mul_arr_priv2",
+        "mat_mul_pointer_alias",
+        "mat_mul_pointer_alias2"
     };
 
     clock_t begin, end;
@@ -108,10 +117,7 @@ int main(int argc, char** argv) {
     int** c = make_zero_mat(n);
     int** d = make_zero_mat(n);
 
-    int mat_size_bm =  n*sizeof(int*)+n*n*sizeof(int);
-    printf("each matrix takes %d Bytes\ntotal usage of matrices a,b,c and d is %d Bytes\n",mat_size_bm,4*mat_size_bm);
-
-    printf("computing d = a*b with a serial calculating\n");
+    printf("\ncomputing d = a*b with a serial calculating\n");
     begin = clock();
     mat_mul(n, a, b, d);
     end = clock();
@@ -119,7 +125,7 @@ int main(int argc, char** argv) {
     printf("finished computing d, in %f seconds\n", time_spent);
 
     // run all tests with a,b,c and n
-    for(k = 0; k < N_TESTS-1; k++) {
+    for(k = 0; k < N_TESTS; k++) {
         printf("\ncomputing c = a*b with test: %s\n",test_names[k]);
         begin = clock();
         tests[k](n, a, b, c);
@@ -132,7 +138,7 @@ int main(int argc, char** argv) {
             for(j = 0; j < n && !bad; j++) {
                 int err = abs(c[i][j] - d[i][j]);
                 if(err > EPS){
-                    printf("BAD RSULTS in test: %s! err: %d i: %d j: %d\n",test_names[k],err,i,j);    
+                    printf("BAD RSULTS in test: %s! err: %d, c[%d][%d]: %d, d[%d][%d]: %d\n",test_names[k],err,i,j,c[i][j],i,j,d[i][j]);
                     bad = 1;
                 }
             }
@@ -142,6 +148,7 @@ int main(int argc, char** argv) {
     free_mat(n, a);
     free_mat(n, b);
     free_mat(n, c);
+    free_mat(n, d);
     
     return 0;
 

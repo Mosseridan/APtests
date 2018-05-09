@@ -35,7 +35,8 @@ int main(int argc, char** argv) {
     }
 
     printf("n is set to %d\n",n);
-
+    int mat_size_bm =  n*n*sizeof(int);
+    printf("each matrix takes %d Bytes\ntotal usage of matrices a,b,c and d is %d Bytes\n",mat_size_bm,4*mat_size_bm);
     // array of tests to be executed
     
     test_type tests[N_TESTS] = { 

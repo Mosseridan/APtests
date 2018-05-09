@@ -21,3 +21,11 @@ void mat_mul_loop_unroll(int n, int** a, int** b, int** c);
 void mat_mul_loop_unroll2(int n, int** a, int** b, int** c);
 
 void mat_mul_loop_unroll3(int n, int** a, int** b, int** c);
+
+void mat_mul_arr_priv(int n, int** a, int** b, int** c);
+
+void mat_mul_arr_priv2(int n, int** a, int** b, int** c);
+
+void mat_mul_pointer_alias(int n, int** a, int** b, int** c);
+
+void mat_mul_pointer_alias2(int n, int** a, int** b, int** c);
