@@ -1,10 +1,12 @@
-all: run_tests 
+all: run_tests run_tests_dyn 
 # mat_mul mat_mul_function_calls mat_mul_function_calls2 mat_mul_function_calls3 mat_mul_function_calls4 mat_mul_loop_unroll mat_mul_loop_unroll2 mat_mul_loop_unroll3
 
 
 run_tests: run_tests.c mat_mul.c
 	gcc -o run_tests.out run_tests.c mat_mul.c -I.
 
+run_tests_dyn: run_tests_dyn.c mat_mul_dyn.c
+	gcc -o run_tests_dyn.out run_tests_dyn.c mat_mul_dyn.c -I.
 
 # mat_mul: mat_mul.c
 # 	gcc -o mat_mul.out mat_mul.c -I
