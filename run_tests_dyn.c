@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <mat_mul_dyn.h>
+#include <string.h>
 
 #define N_TESTS 12
 #define EPS 0
@@ -36,12 +37,14 @@ int** make_rand_mat(int n, int max_val) {
     int i,j;
     int** mat = malloc(sizeof(int*)*n);
     srand(time(NULL)); // generate rand seed from current time
+    
     for (i = 0; i < n; i++) {
         mat[i] = malloc(sizeof(int)*n);
         for (j = 0; j < n; j++) {
             mat[i][j] = rand() % max_val;
         }
     }
+
     return mat;
 }
 
@@ -62,9 +65,21 @@ int** make_zero_mat(int n) {
 int main(int argc, char** argv) {
 
     char *p;
-    int n = 1000;
+    long n = 1000;
     errno = 0;
-  
+    
+    // FILE* fp;
+    // char filename[40];
+    // struct tm *timenow;
+
+    // time_t now = time(NULL);
+    // timenow = gmtime(&now);
+
+    // strftime(filename, sizeof(filename), "test_log_%Y%m%d%H%M%S.csv", timenow);
+    // printf("using %s to log test results\n",filename);
+
+    // fopen(filename,"w");
+
     if (argc >= 2) {
         long conv = strtol(argv[1], &p, 10);
         // Check for errors: e.g., the string does not represent an integer
@@ -75,8 +90,10 @@ int main(int argc, char** argv) {
     }
 
     printf("n is set to %d\n",n);
-    int mat_size_bm =  n*sizeof(int*)+n*n*sizeof(int);
-    printf("each matrix takes %d Bytes\ntotal usage of matrices a,b,c and d is %d Bytes\n",mat_size_bm,4*mat_size_bm);
+    
+    double mat_size_bm = (double)n*(double)n*sizeof(int)+(double)n*sizeof(int*);
+    printf("each matrix takes %g Bytes\ntotal usage of matrices a,b,c and d is %g Bytes\n",mat_size_bm, mat_size_bm*4);
+    
     // array of tests to be executed
     
     test_type tests[N_TESTS] = { 
