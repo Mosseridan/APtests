@@ -107,8 +107,10 @@ int main(int argc, char** argv) {
          }
     }
 
+    printf("n is set to %d\n",n);    
     fprintf(fp,"n is set to %d\n",n);
     double mat_size_bm = (double)n*(double)n*sizeof(int)+(double)n*sizeof(int*);
+    printf("each matrix takes %g Bytes\ntotal usage of matrices a,b,c and d is %g Bytes\n",mat_size_bm, mat_size_bm*4);    
     fprintf(fp, "each matrix takes %g Bytes\ntotal usage of matrices a,b,c and d is %g Bytes\n",mat_size_bm, mat_size_bm*4);
     
     // array of tests to be executed
@@ -152,27 +154,33 @@ int main(int argc, char** argv) {
     int** c = make_zero_mat(n);
     int** d = make_zero_mat(n);
     
+    printf("\ncomputing d = a*b with a serial calculating\n");    
     fprintf(fp, "\ncomputing d = a*b with a serial calculating\n");
     begin = clock();
     mat_mul_serial(n, a, b, d);
     end = clock();
     time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("finished computing d, in %f seconds\n", time_spent);    
     fprintf(fp, "finished computing d, in %f seconds\n", time_spent);
 
     // run all tests with a,b,c and n
     for(k = 0; k < N_TESTS; k++) {
+        printf("\ncomputing c = a*b with test: %s\n",test_names[k]);        
         fprintf(fp, "\ncomputing c = a*b with test: %s\n",test_names[k]);
         begin = clock();
         tests[k](n, a, b, c);
         end = clock();
         time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+        printf("finished test: %s, in %f seconds\n", test_names[k], time_spent);
         fprintf(fp, "finished test: %s, in %f seconds\n", test_names[k], time_spent);
+        printf("verifying that c == d\n");        
         fprintf(fp, "verifying that c == d\n");
         int bad = 0;
         for(i = 0; i < n && !bad; i++) {
             for(j = 0; j < n && !bad; j++) {
                 int err = abs(c[i][j] - d[i][j]);
                 if(err > EPS) {
+                    printf("BAD RSULTS in test: %s! err: %d, c[%d][%d]: %d, d[%d][%d]: %d\n",test_names[k],err,i,j,c[i][j],i,j,d[i][j]);                    
                     fprintf(fp, "BAD RSULTS in test: %s! err: %d, c[%d][%d]: %d, d[%d][%d]: %d\n",test_names[k],err,i,j,c[i][j],i,j,d[i][j]);
                     bad = 1;
                 }
