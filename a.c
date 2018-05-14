@@ -80,7 +80,6 @@ void mat_mul_function_calls3(int n, int** a, int** b, int** c) {
 }
 
 
-
 void compute_ci(int i, int n, int** a, int** b, int** c) {
     int j,k;
     for (j = 0; j < n; j++) {
@@ -115,9 +114,6 @@ void mat_mul_loop_unroll(int n, int** a, int** b, int** c) {
     }
     return;
 }
-
-
-
 void mat_mul_loop_unroll2(int n, int** a, int** b, int** c) {
     int i,j,k;
     for (i = 0; i < n; i++) {
@@ -186,22 +182,6 @@ void mat_mul_arr_priv2(int n, int** a, int** b, int** c) {
     }
     return;
 }
-
-
-void mat_mul_pointer_alias(int n, int** a, int** b, int** c) {
-    int i,j,k;
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            c[i][j] = 0;
-            for (k = 0; k < n; k++) {
-                (*(c+i))[j] += (*(a+i))[k] * b[k][j];
-            }
-        }
-    }
-    return;
-}
-
-
 void mat_mul_pointer_alias2(int n, int** a, int** b, int** c) {
     int i,j,k;
     int** d = c;
@@ -221,6 +201,9 @@ void mat_mul_pointer_alias2(int n, int** a, int** b, int** c) {
     return;
 }
 
-int main (){
-    return;
+
+
+
+int main() {
+    return 0;
 }

@@ -1,0 +1,12 @@
+autoPar mat_mul_dyn.c -I. --keep_going
+autoPar --keep_going mat_mul_dyn.c -I.
+autoPar --keep_going mat_mul_dyn.c -I.
+autoPar --keep_going -annot f.annot mat_mul_dyn.c -I.
+autoPar --keep_going -annot f.annot mat_mul_dyn.c -I.
+autoPar --keep_going -annot f.annot mat_mul.c -I.
+autoPar --keep_going --annot f.annot mat_mul.c -I.
+autoPar --keep_going --annot f.annot mat_mul.c -I.
+autoPar --keep_going --annot f.annot mat_mul.c -I.
+autoPar --keep_going --annot f.annot mat_mul.c -I.
+autoPar --keep_going --annot f.annot mat_mul.c -I.
+autoPar --keep_going mat_mul_dyn.c -I.
