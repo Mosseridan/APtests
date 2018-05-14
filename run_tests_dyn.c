@@ -40,7 +40,7 @@ int** make_rand_mat(int n, int max_val) {
     #pragma omp parallel for private(i,j) firstprivate (n)
     for (i = 0; i < n; i++) {
         mat[i] = malloc(sizeof(int)*n);
-         #pragma omp parallel for private(i,j)
+         #pragma omp parallel for private(j)
         for (j = 0; j < n; j++) {
             mat[i][j] = rand() % max_val;
         }
@@ -56,7 +56,7 @@ int** make_zero_mat(int n) {
     #pragma omp parallel for private(i,j) firstprivate (n)
     for (i = 0; i < n; i++) {
         mat[i] = malloc(sizeof(int)*n);
-        #pragma omp parallel for private(i,j)
+        #pragma omp parallel for private(j)
         for (j = 0; j < n; j++) {
             mat[i][j] = 0;       
         }
@@ -65,23 +65,38 @@ int** make_zero_mat(int n) {
 }
 
 
+void mat_mul_serial(int n, int** a, int** b, int** c) {
+    int i,j,k;
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            c[i][j] = 0;
+            for (k = 0; k < n; k++) {
+                c[i][j] += a[i][k] * b[k][j];
+            }
+        }
+    }
+    return;
+}
+
+
+
 int main(int argc, char** argv) {
 
     char *p;
     long n = 1000;
     errno = 0;
     
-    // FILE* fp;
-    // char filename[40];
-    // struct tm *timenow;
+    FILE* fp;
+    char filename[40];
+    struct tm *timenow;
 
-    // time_t now = time(NULL);
-    // timenow = gmtime(&now);
+    time_t now = time(NULL);
+    timenow = gmtime(&now);
 
-    // strftime(filename, sizeof(filename), "test_log_%Y%m%d%H%M%S.csv", timenow);
-    // printf("using %s to log test results\n",filename);
+    strftime(filename, sizeof(filename), "test_log_%Y%m%d%H%M%S.log", timenow);
+    printf("using %s to log test results\n",filename);
 
-    // fopen(filename,"w");
+    fp = fopen(filename,"w");
 
     if (argc >= 2) {
         long conv = strtol(argv[1], &p, 10);
@@ -92,10 +107,9 @@ int main(int argc, char** argv) {
          }
     }
 
-    printf("n is set to %d\n",n);
-    
+    fprintf(fp,"n is set to %d\n",n);
     double mat_size_bm = (double)n*(double)n*sizeof(int)+(double)n*sizeof(int*);
-    printf("each matrix takes %g Bytes\ntotal usage of matrices a,b,c and d is %g Bytes\n",mat_size_bm, mat_size_bm*4);
+    fprintf(fp, "each matrix takes %g Bytes\ntotal usage of matrices a,b,c and d is %g Bytes\n",mat_size_bm, mat_size_bm*4);
     
     // array of tests to be executed
     
@@ -132,39 +146,44 @@ int main(int argc, char** argv) {
     clock_t begin, end;
     double time_spent;
     int i,j,k;    
+    
     int** a = make_rand_mat(n,2);
     int** b = make_rand_mat(n,2);  
     int** c = make_zero_mat(n);
     int** d = make_zero_mat(n);
-
-    printf("\ncomputing d = a*b with a serial calculating\n");
+    
+    fprintf(fp, "\ncomputing d = a*b with a serial calculating\n");
     begin = clock();
-    mat_mul(n, a, b, d);
+    mat_mul_serial(n, a, b, d);
     end = clock();
     time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("finished computing d, in %f seconds\n", time_spent);
+    fprintf(fp, "finished computing d, in %f seconds\n", time_spent);
 
     // run all tests with a,b,c and n
     for(k = 0; k < N_TESTS; k++) {
-        printf("\ncomputing c = a*b with test: %s\n",test_names[k]);
+        fprintf(fp, "\ncomputing c = a*b with test: %s\n",test_names[k]);
         begin = clock();
         tests[k](n, a, b, c);
         end = clock();
         time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-        printf("finished test: %s, in %f seconds\n", test_names[k], time_spent);
-        printf("verifying that c == d\n");
+        fprintf(fp, "finished test: %s, in %f seconds\n", test_names[k], time_spent);
+        fprintf(fp, "verifying that c == d\n");
         int bad = 0;
         for(i = 0; i < n && !bad; i++) {
             for(j = 0; j < n && !bad; j++) {
                 int err = abs(c[i][j] - d[i][j]);
                 if(err > EPS) {
-                    printf("BAD RSULTS in test: %s! err: %d, c[%d][%d]: %d, d[%d][%d]: %d\n",test_names[k],err,i,j,c[i][j],i,j,d[i][j]);
+                    fprintf(fp, "BAD RSULTS in test: %s! err: %d, c[%d][%d]: %d, d[%d][%d]: %d\n",test_names[k],err,i,j,c[i][j],i,j,d[i][j]);
                     bad = 1;
                 }
             }
         }
     }
         
+    printf("finished %d tests\n",N_TESTS);
+    fprintf(fp, "finished %d tests\n",N_TESTS);
+    fclose(fp);
+
     free_mat(n, a);
     free_mat(n, b);
     free_mat(n, c);
