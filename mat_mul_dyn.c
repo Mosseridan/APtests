@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mat_mul_dyn.h>
+#include <omp.h>
 
 void mat_mul(int n, int** a, int** b, int** c) {
     int i,j,k;
@@ -188,7 +189,7 @@ void mat_mul_arr_priv2(int n, int** a, int** b, int** c) {
 }
 
 
-// void mat_mul_pointer_alias(int n, int** a, int** b, int** c) {
+void mat_mul_pointer_alias(int n, int** a, int** b, int** c) {
     int i,j,k;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
@@ -218,9 +219,5 @@ void mat_mul_pointer_alias2(int n, int** a, int** b, int** c) {
             }
         }
     }
-    return;
-}
-
-int main (){
     return;
 }

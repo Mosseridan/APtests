@@ -1,17 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mat_mul_dyn.h>
-#include "omp.h" 
+#include "omp.h"
 
 void mat_mul(int n,int **a,int **b,int **c)
 {
   int i;
   int j;
   int k;
-  
+
 #pragma omp parallel for private (i,j,k) firstprivate (n)
   for (i = 0; i <= n - 1; i += 1) {
-    
+
 #pragma omp parallel for private (j,k)
     for (j = 0; j <= n - 1; j += 1) {
       c[i][j] = 0;
@@ -90,7 +90,7 @@ void compute_ci(int i,int n,int **a,int **b,int **c)
 {
   int j;
   int k;
-  
+
 #pragma omp parallel for private (j,k) firstprivate (i,n)
   for (j = 0; j <= n - 1; j += 1) {
     c[i][j] = 0;
@@ -114,10 +114,10 @@ void mat_mul_loop_unroll(int n,int **a,int **b,int **c)
   int i;
   int j;
   int k;
-  
+
 #pragma omp parallel for private (i,j,k) firstprivate (n)
   for (i = 0; i <= n - 1; i += 1) {
-    
+
 #pragma omp parallel for private (j,k)
     for (j = 0; j <= n - 1; j += 1) {
       c[i][j] = 0;
@@ -135,7 +135,7 @@ void mat_mul_loop_unroll2(int n,int **a,int **b,int **c)
   int i;
   int j;
   int k;
-  
+
 #pragma omp parallel for private (i,j,k) firstprivate (n)
   for (i = 0; i <= n - 1; i += 1) {
 // we asume that n is even
@@ -199,7 +199,7 @@ void mat_mul_arr_priv2(int n,int **a,int **b,int **c)
   int j;
   int k;
   int *d = (malloc(sizeof(int ) * n));
-  
+
 #pragma omp parallel for private (i,j,k) firstprivate (n)
   for (i = 0; i <= n - 1; i += 1) {
     for (j = 0; j <= n - 1; j += 1) {
@@ -235,20 +235,20 @@ void mat_mul_pointer_alias2(int n,int **a,int **b,int **c)
   int j;
   int k;
   int **d = c;
-  
+
 #pragma omp parallel for private (i,j)
   for (i = 0; i <= n - 1; i += 1) {
     c[i][0] = 0;
-    
+
 #pragma omp parallel for private (j)
     for (j = 1; j <= n - 1; j += 1) {
       c[i][j] = d[i][j - 1];
     }
   }
-  
+
 #pragma omp parallel for private (i,j,k) firstprivate (n)
   for (i = 0; i <= n - 1; i += 1) {
-    
+
 #pragma omp parallel for private (j,k)
     for (j = 0; j <= n - 1; j += 1) {
       for (k = 0; k <= n - 1; k += 1) {
@@ -257,9 +257,4 @@ void mat_mul_pointer_alias2(int n,int **a,int **b,int **c)
     }
   }
   return ;
-}
-
-int main()
-{
-  return 0;
 }
