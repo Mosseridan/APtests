@@ -37,9 +37,10 @@ int** make_rand_mat(int n, int max_val) {
     int i,j;
     int** mat = malloc(sizeof(int*)*n);
     srand(time(NULL)); // generate rand seed from current time
-    
+    #pragma omp parallel for private(i,j) firstprivate (n)
     for (i = 0; i < n; i++) {
         mat[i] = malloc(sizeof(int)*n);
+         #pragma omp parallel for private(i,j)
         for (j = 0; j < n; j++) {
             mat[i][j] = rand() % max_val;
         }
@@ -52,8 +53,10 @@ int** make_zero_mat(int n) {
     int i,j;
     int** mat = malloc (sizeof(int*)*n);
     srand(time(NULL)); // generate rand seed from current time
+    #pragma omp parallel for private(i,j) firstprivate (n)
     for (i = 0; i < n; i++) {
         mat[i] = malloc(sizeof(int)*n);
+        #pragma omp parallel for private(i,j)
         for (j = 0; j < n; j++) {
             mat[i][j] = 0;       
         }
@@ -154,7 +157,7 @@ int main(int argc, char** argv) {
         for(i = 0; i < n && !bad; i++) {
             for(j = 0; j < n && !bad; j++) {
                 int err = abs(c[i][j] - d[i][j]);
-                if(err > EPS){
+                if(err > EPS) {
                     printf("BAD RSULTS in test: %s! err: %d, c[%d][%d]: %d, d[%d][%d]: %d\n",test_names[k],err,i,j,c[i][j],i,j,d[i][j]);
                     bad = 1;
                 }

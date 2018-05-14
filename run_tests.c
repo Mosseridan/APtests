@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
         int bad = 0;
         for(i = 0; i < n*n; i++) {
             int err = abs(c[i] - d[i]);
-            if(err > EPS){
+            if(err > EPS) {
                 printf("BAD RSULTS in test: %s! err: %d i: %d j: %d\n",test_names[k],err,i,j);
                 printf("c[%d]: %d\n",i,c[i]);
                 printf("d[%d]: %d\n",i,d[i]);
