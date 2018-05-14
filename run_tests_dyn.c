@@ -5,6 +5,7 @@
 #include <limits.h>
 #include <mat_mul_dyn.h>
 #include <string.h>
+#include <omp.h> 
 
 #define N_TESTS 12
 #define EPS 0
@@ -22,7 +23,6 @@ void print_mat(int n , int** mat) {
     }
     printf("\n");
 }
-
 
 
 void free_mat(int n, int** mat) {
