@@ -188,7 +188,7 @@ void mat_mul_arr_priv2(int n, int** a, int** b, int** c) {
 }
 
 
-void mat_mul_pointer_alias(int n, int** a, int** b, int** c) {
+// void mat_mul_pointer_alias(int n, int** a, int** b, int** c) {
     int i,j,k;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
