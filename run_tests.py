@@ -30,13 +30,13 @@ def run_test(test, dest_dir, max_size, times, sbatch):
         batch_file = make_batch_file(test_name, dest_dir)     
         for n in range(1000, max_size+1, 1000):
             for i in range(0,times):
-                print '@ '+str(n)+' : '+str(i)
-                sub_proc = subprocess.Popen(['sbach', '-o', test_name+'_'+str(n)+'_'+str(i), batch_file, test, str(n)], cwd=dest_dir)
+                print '\n@ '+str(n)+' : '+str(i)
+                sub_proc = subprocess.Popen(['sbatch', '-o', test_name+'_'+str(n)+'_'+str(i), batch_file, test, str(n)], cwd=dest_dir)
                 sub_proc.wait()
     else:
         for n in range(1000, max_size+1, 1000):
             for i in range(0,times):
-                print '@ '+str(n)+' : '+str(i)
+                print '\n@ '+str(n)+' : '+str(i)
                 sub_proc = subprocess.Popen([test, str(n), '|', 'tee',test_name+'_'+str(n)+'_'+str(i)], cwd=dest_dir)
                 sub_proc.wait()
 
@@ -57,7 +57,7 @@ def main(dir, max_size, times, sbatch):
         for name in files:
             if os.path.splitext(name)[1] == '.out':
                 test = os.path.join(root,name)
-                print "@@ runing test: "+test
+                print "\n@@ runing test: "+test
                 run_test(test, dest_dir, max_size, times, sbatch)
 
 
