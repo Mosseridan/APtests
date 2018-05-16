@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "string.h": "c",
+        "omp.h": "c",
+        "limits.h": "c",
+        "errno.h": "c",
+        "mat_mul.h": "c",
+        "time.h": "c"
+    }
+}

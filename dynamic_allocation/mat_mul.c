@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <mat_mul_dyn.h>
+#include <mat_mul.h>
 #include <omp.h>
 
 void mat_mul(int n, int** a, int** b, int** c) {

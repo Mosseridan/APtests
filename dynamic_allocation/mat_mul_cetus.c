@@ -33,7 +33,7 @@ wchar_t uses ISOIEC 10646 (2nd ed., published 2011-03-15) /
 /* We do not support C11 <threads.h>.  */
 #include <stdio.h>
 #include <stdlib.h>
-#include <mat_mul_dyn.h>
+#include <mat_mul.h>
 void mat_mul(int n, int * * a, int * * b, int * * c)
 {
 	int i, j, k;
