@@ -35,13 +35,12 @@ void run_test(test_type test, const char* test_name, int n, int** a, int** b, in
     end = omp_get_wtime();
     printf("finished test: %s, in %lf seconds\n", test_name, end - start);
     printf("verifying that c == d\n"); 
-    fprintf(log_file, "\n%s,%lf", test_name, end - start);           
     if (compare_pat(n, &i, &j, c, d)) {
         printf("BAD RSULTS in test: %s!, c[%d][%d]: %d, d[%d][%d]: %d\n",test_name,i,j,c[i][j],i,j,d[i][j]);
-        fprintf(log_file, ",X");           
+        fprintf(log_file, "\n%d,%s,%lf,X", n, test_name, end - start);             
     }
     else {
-        fprintf(log_file, ",V");
+        fprintf(log_file, "\n%d,%s,%lf,V", n, test_name, end - start);           
     }
 }
 
@@ -59,7 +58,7 @@ int main(int argc, char** argv) {
 
     time_t now = time(NULL);
     timenow = gmtime(&now);
-    
+
     strftime(filename, sizeof(filename), "test_log_%Y%m%d%H%M%S.csv", timenow);
     printf("using %s to log test results\n",filename);
     
