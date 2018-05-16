@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
     printf("using %s to log test results\n",filename);
     
     log_file = fopen(filename,"w");
-    fprintf(log_file, "test,time,correct");
+    fprintf(log_file, "n,test,time,correct");
   
     if (argc >= 2) {
         long conv = strtol(argv[1], &p, 10);
@@ -126,7 +126,9 @@ int main(int argc, char** argv) {
     start = omp_get_wtime();
     mat_mul_serial(n, a, b, d);
     end = omp_get_wtime();
-    printf("finished computing d, in %lf seconds\n", end - start);    
+    printf("finished computing d, in %lf seconds\n", end - start);
+    fprintf(log_file, "\n%d,%s,%lf,V", n, "mat_mul_serial", end - start);             
+      
 
     if(test_num > -1) {
         run_test(tests[test_num], test_names[test_num],n , a, b, c, d, log_file);
