@@ -30,14 +30,16 @@ def run_test(test, dest_dir, max_size, times, sbatch):
         batch_file = make_batch_file(test_name, dest_dir)     
         for n in range(1000, max_size+1, 1000):
             for i in range(0,times):
-                print '\n@ '+str(n)+' : '+str(i)
-                sub_proc = subprocess.Popen(['sbatch', '-o', test_name+'_'+str(n)+'_'+str(i), batch_file, test, str(n)], cwd=dest_dir)
+                job_name = test_name+'_'+str(n)+'_'+str(i)
+                print '\n@ running job: '+job_name
+                sub_proc = subprocess.Popen(['sbatch', '-o', job_name, batch_file, test, '-n', str(n), '-j', job_name], cwd=dest_dir)
                 sub_proc.wait()
     else:
         for n in range(1000, max_size+1, 1000):
             for i in range(0,times):
-                print '\n@ '+str(n)+' : '+str(i)
-                sub_proc = subprocess.Popen([test, str(n), '|', 'tee',test_name+'_'+str(n)+'_'+str(i)], cwd=dest_dir)
+                job_name = test_name+'_'+str(n)+'_'+str(i)
+                print '\n@ running job: '+job_name
+                sub_proc = subprocess.Popen([test, '-n', str(n), '-j', job_name, '|', 'tee',job_name], cwd=dest_dir)
                 sub_proc.wait()
 
 
