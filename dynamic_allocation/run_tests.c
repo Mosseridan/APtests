@@ -75,7 +75,9 @@ int main(int argc, char** argv) {
          
          if (argc >= 3) {
             conv = strtol(argv[2], &p, 10);
-            test_num = conv;
+            if (errno == 0 && *p == '\0' && conv <= INT_MAX) {
+                test_num = conv;
+            }
          }
     }
 
