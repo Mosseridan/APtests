@@ -6,6 +6,7 @@
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
+#include <time.h>
 
 #define N_TESTS 12
 
@@ -25,20 +26,22 @@ void mat_mul_serial(int n, int** a, int** b, int** c) {
 }
 
 
-void run_test(test_type test, const char* test_name, int n, int** a, int** b, int** c, int** d) {
+void run_test(test_type test, const char* test_name, int n, int** a, int** b, int** c, int** d, FILE* log_file) {
     int i,j;
     double start, end;
     printf("\ncomputing c = a*b with test: %s\n",test_name);        
-    // fprintf(fp, "\ncomputing c = a*b with test: %s\n",test_names[k]);
     start = omp_get_wtime();
     test(n, a, b, c);
     end = omp_get_wtime();
     printf("finished test: %s, in %lf seconds\n", test_name, end - start);
-    // fprintf(fp, "finished test: %s, in %lf seconds\n", test_names[k], end - start);
-    printf("verifying that c == d\n");        
-    // fprintf(fp, "verifying that c == d\n");
+    printf("verifying that c == d\n"); 
+    fprintf(log_file, "\n%s,%lf", test_name, end - start);           
     if (compare_pat(n, &i, &j, c, d)) {
-        printf("BAD RSULTS in test: %s!, c[%d][%d]: %d, d[%d][%d]: %d\n",test_name,i,j,c[i][j],i,j,d[i][j]);  
+        printf("BAD RSULTS in test: %s!, c[%d][%d]: %d, d[%d][%d]: %d\n",test_name,i,j,c[i][j],i,j,d[i][j]);
+        fprintf(log_file, ",X");           
+    }
+    else {
+        fprintf(log_file, ",V");
     }
 }
 
@@ -50,18 +53,18 @@ int main(int argc, char** argv) {
     long test_num = -1;
     errno = 0;
     
-    // FILE* fp;
-    // char filename[40];
-    // struct tm *timenow;
+    FILE* log_file;
+    char filename[40];
+    struct tm *timenow;
 
-    // time_t now = time(NULL);
-    // timenow = gmtime(&now);
-
-    // strftime(filename, sizeof(filename), "test_log_%Y%m%d%H%M%S.log", timenow);
-    // printf("using %s to log test results\n",filename);
-
-    // fp = fopen(filename,"w");
-
+    time_t now = time(NULL);
+    timenow = gmtime(&now);
+    
+    strftime(filename, sizeof(filename), "test_log_%Y%m%d%H%M%S.csv", timenow);
+    printf("using %s to log test results\n",filename);
+    
+    log_file = fopen(filename,"w");
+    fprintf(log_file, "test,time,correct");
   
     if (argc >= 2) {
         long conv = strtol(argv[1], &p, 10);
@@ -78,10 +81,8 @@ int main(int argc, char** argv) {
     }
 
     printf("n is set to %d\n",n);    
-    // fprintf(fp,"n is set to %d\n",n);
     double mat_size_bm = (double)n*(double)n*sizeof(int)+(double)n*sizeof(int*);
     printf("each matrix takes %g Bytes\ntotal usage of matrices a,b,c and d is %g Bytes\n",mat_size_bm, mat_size_bm*4);    
-    // fprintf(fp, "each matrix takes %g Bytes\ntotal usage of matrices a,b,c and d is %g Bytes\n",mat_size_bm, mat_size_bm*4);
     
     // array of tests to be executed
     test_type tests[N_TESTS] = {
@@ -123,44 +124,24 @@ int main(int argc, char** argv) {
     int** d = make_zero_mat(n);
     
     printf("\ncomputing d = a*b with a serial calculation\n");    
-    // fprintf(fp, "\ncomputing d = a*b with a serial calculating\n");
     start = omp_get_wtime();
     mat_mul_serial(n, a, b, d);
     end = omp_get_wtime();
     printf("finished computing d, in %lf seconds\n", end - start);    
-    // fprintf(fp, "finished computing d, in %lf seconds\n", end - start);
 
     if(test_num > -1) {
-        run_test(tests[test_num], test_names[test_num],n , a, b, c, d);
+        run_test(tests[test_num], test_names[test_num],n , a, b, c, d, log_file);
         printf("finished test\n",N_TESTS);     
     }
     else {
        // run all tests with a,b,c and n
         for(test_num = 0; test_num < N_TESTS; test_num++) {
-            run_test(tests[test_num], test_names[test_num],n , a, b, c, d);
-            // printf("\ncomputing c = a*b with test: %s\n",test_names[test_num]);        
-            // // fprintf(fp, "\ncomputing c = a*b with test: %s\n",test_names[test_num]);
-            // start = omp_get_wtime();
-            // tests[test_num](n, a, b, c);
-            // end = omp_get_wtime();
-            // printf("finished test: %s, in %lf seconds\n", test_names[test_num], end - start);
-            // // fprintf(fp, "finished test: %s, in %lf seconds\n", test_names[test_num], end - start);
-            // printf("verifying that c == d\n");        
-            // // fprintf(fp, "verifying that c == d\n");
-            // if (compare_pat(n, &i, &j, c, d)) {
-            //     printf("BAD RSULTS in test: %s!, c[%d][%d]: %d, d[%d][%d]: %d\n",test_names[test_num],i,j,c[i][j],i,j,d[i][j]);  
-            // }
+            run_test(tests[test_num], test_names[test_num],n , a, b, c, d, log_file);
         }
         printf("finished %d tests\n",N_TESTS);    
     }
 
-    
-
-
-        
-    // fprintf(fp, "finished %d tests\n",N_TESTS);
-    // fclose(fp);
-
+    fclose(log_file);
     free_mat(n, a);
     free_mat(n, b);
     free_mat(n, c);
