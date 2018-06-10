@@ -1,9 +1,9 @@
-void print_mat(int n , int** mat);
+#include "params.h"
 
-void free_mat(int n, int** mat);
+void print_mat(int n , int mat[N][N]);
 
-int** make_rand_mat(int n, int max_val);
+void make_rand_mat(int n, int mat[N][N], int max_val);
 
-int** make_zero_mat(int n);
+void make_zero_mat(int n, int mat[N][N]);
 
-int compare_pat(int n, int* bad_i, int* bad_j, int** mat1, int** mat2);
+int compare_pat(int n, int* bad_i, int* bad_j, int mat1[N][N], int mat2[N][N]);

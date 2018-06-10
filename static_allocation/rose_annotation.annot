@@ -1,3 +1,0 @@
-operator compute_cijk(int i, int j, int k ,void *a,int *b) {
-    modify none;read{a,b,i,j,k};allow_alias none;
-}

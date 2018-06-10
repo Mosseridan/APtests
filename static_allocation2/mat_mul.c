@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <mat_mul.h>
 #include <omp.h>
-#include "mat_mul.h"
 
-void mat_mul(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul(int n) {
     int i,j,k;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
@@ -18,13 +18,13 @@ void mat_mul(int n, int a[N][N], int b[N][N], int c[N][N]) {
 
 
 
-int compute_cijk(int i, int j, int k, int a[N][N], int b[N][N]) {
+int compute_cijk(int i, int j, int k, int[N][N] a, int[N][N] b) {
     return a[i][k] * b[k][j];
 }
 
 
 
-void mat_mul_function_calls(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul_function_calls(int n) {
     int i,j,k;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
@@ -39,13 +39,13 @@ void mat_mul_function_calls(int n, int a[N][N], int b[N][N], int c[N][N]) {
 
 
 
-void compute_cijk2(int i, int j, int k, int a[N][N], int b[N][N], int c[N][N]) {
+void compute_cijk2(int i, int j, int k) {
      c[i][j] += a[i][k] * b[k][j];
 }
 
 
 
-void mat_mul_function_calls2(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul_function_calls2(int n) {
     int i,j,k;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
@@ -60,7 +60,7 @@ void mat_mul_function_calls2(int n, int a[N][N], int b[N][N], int c[N][N]) {
 
 
 
-void compute_cij(int i, int j , int n, int a[N][N], int b[N][N], int c[N][N]) {
+void compute_cij(int i, int j , int n) {
     int k;
     c[i][j] = 0;
     for (k = 0; k < n; k++) {
@@ -70,7 +70,7 @@ void compute_cij(int i, int j , int n, int a[N][N], int b[N][N], int c[N][N]) {
 
 
 
-void mat_mul_function_calls3(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul_function_calls3(int n) {
     int i,j;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
@@ -82,7 +82,7 @@ void mat_mul_function_calls3(int n, int a[N][N], int b[N][N], int c[N][N]) {
 
 
 
-void compute_ci(int i, int n, int a[N][N], int b[N][N], int c[N][N]) {
+void compute_ci(int i, int n) {
     int j,k;
     for (j = 0; j < n; j++) {
         c[i][j] = 0;
@@ -94,7 +94,7 @@ void compute_ci(int i, int n, int a[N][N], int b[N][N], int c[N][N]) {
 
 
 
-void mat_mul_function_calls4(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul_function_calls4(int n) {
     int i;
     for (i = 0; i < n; i++) {
         compute_ci(i,n,a,b,c);
@@ -104,7 +104,7 @@ void mat_mul_function_calls4(int n, int a[N][N], int b[N][N], int c[N][N]) {
 
 
 
-void mat_mul_loop_unroll(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul_loop_unroll(int n) {
     int i,j,k;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
@@ -119,7 +119,7 @@ void mat_mul_loop_unroll(int n, int a[N][N], int b[N][N], int c[N][N]) {
 
 
 
-void mat_mul_loop_unroll2(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul_loop_unroll2(int n) {
     int i,j,k;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n-1; j+= 2) { // we asume that n is even
@@ -136,7 +136,7 @@ void mat_mul_loop_unroll2(int n, int a[N][N], int b[N][N], int c[N][N]) {
 
 
 
-void mat_mul_loop_unroll3(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul_loop_unroll3(int n) {
     int i,j,k;
     for (i = 0; i < n-1; i+=2) { // we asume that n is even
         for (j = 0; j < n-1; j+= 2) {
@@ -156,7 +156,7 @@ void mat_mul_loop_unroll3(int n, int a[N][N], int b[N][N], int c[N][N]) {
 }
 
 
-void mat_mul_arr_priv(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul_arr_priv(int n) {
     int i,j,k;
     int* d = malloc(sizeof(int)*n);
     for (i = 0; i < n; i++) {
@@ -173,7 +173,7 @@ void mat_mul_arr_priv(int n, int a[N][N], int b[N][N], int c[N][N]) {
 }
 
 
-void mat_mul_arr_priv2(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul_arr_priv2(int n) {
     int i,j,k;
     int* d = malloc(sizeof(int)*n);
     for (i = 0; i < n; i++) {
@@ -189,7 +189,7 @@ void mat_mul_arr_priv2(int n, int a[N][N], int b[N][N], int c[N][N]) {
 }
 
 
-void mat_mul_pointer_alias(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul_pointer_alias(int n) {
     int i,j,k;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
@@ -203,14 +203,13 @@ void mat_mul_pointer_alias(int n, int a[N][N], int b[N][N], int c[N][N]) {
 }
 
 
-void mat_mul_pointer_alias2(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul_pointer_alias2(int n) {
     int i,j,k;
-    // typedef int multiArray[N][N];
+    int** d = c;
     for (i = 0; i < n; i++) {
         c[i][0] = 0;
-        int* d = c[i];
         for (j = 1; j < n; j++) {
-            c[i][j] = d[j-1];
+            c[i][j] = d[i][j-1];
         }
     }
     for (i = 0; i < n; i++) {

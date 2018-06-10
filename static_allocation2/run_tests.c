@@ -1,23 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
+#include <utils.h>
+#include <mat_mul.h>
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
 #include <time.h>
-#include "utils.h"
-#include "mat_mul.h"
 
 #define N_TESTS 12
 #define STR_SIZE 100
-int a[N][N]; 
-int b[N][N]; 
-int c[N][N];
-int d[N][N];
+typedef void (*test_type)(int n);
 
-typedef void (*test_type)(int n, int a[N][N], int b[N][N], int c[N][N]);
-
-void mat_mul_serial(int n, int a[N][N], int b[N][N], int c[N][N]) {
+void mat_mul_serial(int n) {
     int i,j,k;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
@@ -31,7 +26,7 @@ void mat_mul_serial(int n, int a[N][N], int b[N][N], int c[N][N]) {
 }
 
 
-void run_test(test_type test, const char* test_name, int n, int a[N][N], int b[N][N], int c[N][N], int d[N][N], FILE* log_file, double mat_size_mb) {
+void run_test(test_type test, const char* test_name, int n, FILE* log_file, double mat_size_mb) {
     int i,j;
     double start, end;
     printf("\ncomputing c = a*b with test: %s\n",test_name);        
@@ -53,11 +48,12 @@ void run_test(test_type test, const char* test_name, int n, int a[N][N], int b[N
 int main(int argc, char** argv) {
 
     char *p;
+    long n = 1000;
     long test_num = -1;
     errno = 0;
     
     double start, end;
-    int i,j,k;
+    int i,j,k;    
 
     FILE* log_file;
     char filename[STR_SIZE];
@@ -68,14 +64,14 @@ int main(int argc, char** argv) {
     strftime(filename, sizeof(filename), "test_log_%Y%m%d%H%M%S.csv", timenow);
     
     for(i = 1; i < argc-1; i++) {
-        // if(strcmp(argv[i],"-n") == 0) {
-        //     long conv = strtol(argv[i+1], &p, 10);
-        //     if (errno == 0 && *p == '\0' && conv <= INT_MAX) {
-        //         n = conv;
-        //     }
-        //     i++;
-        // }
-        if(strcmp(argv[i],"-t") == 0) {
+        if(strcmp(argv[i],"-n") == 0) {
+            long conv = strtol(argv[i+1], &p, 10);
+            if (errno == 0 && *p == '\0' && conv <= INT_MAX) {
+                n = conv;
+            }
+            i++;
+        }
+        else if(strcmp(argv[i],"-t") == 0) {
             long conv = strtol(argv[i+1], &p, 10);
             if (errno == 0 && *p == '\0' && conv <= INT_MAX) {
                 test_num = conv;
@@ -92,8 +88,8 @@ int main(int argc, char** argv) {
     log_file = fopen(filename,"w");    
     fprintf(log_file, "n,test_name,time,correct,mat_size");
     
-    printf("n is set to %d\n",N);    
-    double mat_size_mb = ((double)N*(double)N*sizeof(int)+(double)N*sizeof(int*))/(double)1000000;
+    printf("n is set to %d\n",n);    
+    double mat_size_mb = ((double)n*(double)n*sizeof(int)+(double)n*sizeof(int*))/(double)1000000;
     printf("each matrix takes %g MB\ntotal usage of matrices a,b,c and d is %lf MB\n",mat_size_mb, mat_size_mb*4);    
     
     // array of tests to be executed
@@ -127,32 +123,36 @@ int main(int argc, char** argv) {
         "mat_mul_pointer_alias2"
     };
 
-    make_rand_mat(N,a,2);
-    make_rand_mat(N,b,2);  
-    make_zero_mat(N,c);
-    make_zero_mat(N,d);
+    a = make_rand_mat(n,2);
+    b = make_rand_mat(n,2);  
+    c = make_zero_mat(n);
+    d = make_zero_mat(n);
     
     printf("\ncomputing d = a*b with a serial calculation\n");    
     start = omp_get_wtime();
-    mat_mul_serial(N, a, b, d);
+    mat_mul_serial(n);
     end = omp_get_wtime();
     printf("finished computing d, in %lf seconds\n", end - start);
-    fprintf(log_file, "\n%d,%s,%lf,V,%lf", N, "mat_mul_serial", end - start,mat_size_mb, mat_size_mb);             
+    fprintf(log_file, "\n%d,%s,%lf,V,%lf", n, "mat_mul_serial", end - start,mat_size_mb, mat_size_mb);             
       
 
     if(test_num > -1) {
-        run_test(tests[test_num], test_names[test_num], N, a, b, c, d, log_file, mat_size_mb);
+        run_test(tests[test_num], test_names[test_num],n , a, b, c, d, log_file, mat_size_mb);
         printf("finished test\n",N_TESTS);     
     }
     else {
        // run all tests with a,b,c and n
         for(test_num = 0; test_num < N_TESTS; test_num++) {
-            run_test(tests[test_num], test_names[test_num], N , a, b, c, d, log_file, mat_size_mb);
+            run_test(tests[test_num], test_names[test_num],n , a, b, c, d, log_file, mat_size_mb);
         }
         printf("finished %d tests\n",N_TESTS);    
     }
 
     fclose(log_file);
+    free_mat(n, a);
+    free_mat(n, b);
+    free_mat(n, c);
+    free_mat(n, d);
     
     return 0;
 
