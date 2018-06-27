@@ -1,0 +1,2 @@
+# APtests
+Auto palatalization tests
