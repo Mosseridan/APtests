@@ -19,7 +19,7 @@ def make_batch_file(test_name, test_dir):
     return batch_file_path
 
 
-def run_test(test, dest_dir, start=100, end=300, stride=100, times=1, sbatch=False):
+def run_test(test, dest_dir, start=100, end=300, stride=100, times=1, sbatch=False, slurm_partition='nxtscl'):
     test_name = os.path.splitext(os.path.basename(test))[0]
     if sbatch:
         batch_file = make_batch_file(test_name, dest_dir)     
@@ -27,7 +27,8 @@ def run_test(test, dest_dir, start=100, end=300, stride=100, times=1, sbatch=Fal
             for i in range(0,times):
                 job_name = test_name+'_'+str(n)+'_'+str(i)
                 print('\n@ running job: '+job_name)
-                sub_proc = subprocess.Popen(['sbatch', '-o', job_name, batch_file, test, '-n', str(n), '-j', job_name], cwd=dest_dir)
+                sub_proc = subprocess.Popen(['sbatch', '-o', job_name, batch_file, test,
+                                             '-p', slurm_partition, '-n', str(n), '-j', job_name], cwd=dest_dir)
                 sub_proc.wait()
     else:
         for n in range(start, end+1, stride):
@@ -38,7 +39,7 @@ def run_test(test, dest_dir, start=100, end=300, stride=100, times=1, sbatch=Fal
                 sub_proc.wait()
 
 
-def main(dir, start, end, stride, times, sbatch):
+def main(dir=, start=100, end=200, stride=100, times=1, sbatch=False, slurm_partition='nxtscl'):
     print '\n@@ Got dir: '+dir   
     print '\n@@ Got times: '+str(times)
 
@@ -57,7 +58,7 @@ def main(dir, start, end, stride, times, sbatch):
                 print("\n@@ runing test: "+test)
                 test_dest_dir = os.path.join(dest_dir, split_ext[0])
                 os.path.makedirs(test_dest_dir, exist_ok=True)
-                run_test(test, test_dest_dir, start, end, stride, times, sbatch)
+                run_test(test, test_dest_dir, start, end, stride, times, sbatch, slurm_partition)
 
 
 if __name__ == '__main__':
@@ -85,7 +86,16 @@ if __name__ == '__main__':
         action='store_true',
         dest='sbatch',
         help='Run with sbatch.')
+    parser.add_argument('-p',
+        dest='slurm_partition',
+        help='Slurm partition to use with sbatch.')
     args = parser.parse_args()
 
-    main(args.dir, args.start, args.end, args.staride, args.times, args.sbatch)
+    main(args.dir,
+         start=args.start,
+         end=args.end,
+         stride=args.stride,
+         times=args.times,
+         sbatch=args.sbatch,
+         slurm_partition=args.slurm_partition)
     print("\n@@ Done")
