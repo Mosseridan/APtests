@@ -27,8 +27,8 @@ def run_test(test, dest_dir, start=100, end=100, stride=100, times=1, sbatch=Fal
             for i in range(0,times):
                 job_name = test_name+'_'+str(n)+'_'+str(i)
                 print('\n@ running job: '+job_name)
-                sub_proc = subprocess.Popen(['sbatch', '-o', job_name, batch_file, test,
-                                             '-p', slurm_partition, '-n', str(n), '-j', job_name], cwd=dest_dir)
+                sub_proc = subprocess.Popen(['sbatch', '-p', slurm_partition, '-o', job_name,
+                                             batch_file, test, '-n', str(n), '-j', job_name], cwd=dest_dir)
                 sub_proc.wait()
     else:
         for n in range(start, end+1, stride):
