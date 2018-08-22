@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
     fprintf(log_file, "n,test_name,time,correct,mat_size");
     
     printf("n is set to %d\n",n);    
-    double mat_size_mb = ((double)n*(double)n*sizeof(int)+(double)n*sizeof(int*))/(double)1000000;
+    double mat_size_mb = ((double)n*(double)n*sizeof(int)+2*(double)n*sizeof(int*))/(double)1000000;
     printf("each matrix takes %g MB\ntotal usage of matrices a,b,c and d is %lf MB\n",mat_size_mb, mat_size_mb*4);    
     
     // array of tests to be executed
