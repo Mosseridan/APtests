@@ -1,37 +1,79 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <omp.h>
+#include <utils.h>
+#include <mat_mul.h>
+#include <string.h>
 #include <errno.h>
 #include <limits.h>
-#include <mat_mul.h>
+#include <time.h>
 
 #define N_TESTS 1
-#define EPS 0
+#define STR_SIZE 100
+typedef void (*test_type)(int* a ,int* b,int* c);
 
-typedef void (*test_type)(int n,int* a ,int* b,int* c);
-
-void free_mat(int n, int** mat) {
-    int i;
-    for(i = 0; i < n; i++) {
-        free(mat[i]);
+void run_test(test_type test, const char* test_name, int* a, int* b, int* c, FILE* log_file, double mat_size_mb) {
+    int i,j;
+    double start, end;
+    printf("\ncomputing c = a*b with test: %s\n",test_name);        
+    start = omp_get_wtime();
+    test(a, b, c);
+    end = omp_get_wtime();
+    printf("finished test: %s, in %lf seconds\n", test_name, end - start);
+    fprintf(log_file, "\n%d,%s,%lf,V,%lf", N, test_name, end - start, mat_size_mb);
+    printf("\nA:\n");
+    for(i=0; i< N*N; i++){
+        printf(" %d ",a[i]);   
     }
-    free(mat);
+    printf("\nB:\n");
+    for(i=0; i< N*N; i++){
+        printf(" %d ",b[i]);   
+    }
+    printf("\nC:\n");
+    for(i=0; i< N*N; i++){
+        printf(" %d ",c[i]);  
+    }
+    printf("\n");
 }
 
 
 int main(int argc, char** argv) {
 
-
     char *p;
+    long test_num = -1;
     errno = 0;
-  
-
-    printf("N is set to %d\n",N);
-    int mat_size_bm =  N*N*sizeof(int);
-    printf("each matrix takes %d Bytes\ntotal usage of matrices a,b,c and d is %d Bytes\n",mat_size_bm,4*mat_size_bm);
-    // array of tests to be executed
     
-    test_type tests[N_TESTS] = { 
+    double start, end;
+    int i,j,k;    
+    int* a; 
+    int* b; 
+    int* c;
+
+    FILE* log_file;
+    char filename[STR_SIZE];
+    struct tm *timenow;
+
+    time_t now = time(NULL);
+    timenow = gmtime(&now);
+    strftime(filename, sizeof(filename), "test_log_%Y%m%d%H%M%S.csv", timenow);
+    
+    for(i = 1; i < argc-1; i++) {
+        if(strcmp(argv[i],"-j") == 0) {
+            snprintf(filename, sizeof(filename),"%s.csv",argv[i+1]);
+            i++;
+        }
+    }
+    
+    printf("using %s to log test results\n",filename);
+    log_file = fopen(filename,"w");    
+    fprintf(log_file, "n,test_name,time,correct,mat_size");
+    
+    printf("N is set to %d\n",N);    
+    double mat_size_mb = ((double)N*(double)N*sizeof(int)+(double)N*sizeof(int*))/(double)1000000;
+    printf("each matrix takes %g MB\ntotal usage of matrices a,b,c and d is %lf MB\n",mat_size_mb, mat_size_mb*4);    
+    
+    // array of tests to be executed
+    test_type tests[N_TESTS] = {
         &mat_mul
     };
 
@@ -39,61 +81,27 @@ int main(int argc, char** argv) {
         "mat_mul"
     };
 
-    clock_t begin, end;
-    double time_spent;
-    int i,j,k;    
-    int* a = malloc (sizeof(int)*N*N);  
-    int* b = malloc (sizeof(int)*N*N);  
-    int* c = malloc (sizeof(int)*N*N);  
-    int* d = malloc (sizeof(int)*N*N);
-    printf("initializeing a and b with pseudo random numbers and c with zeros\n");
-    begin = clock();
+    a = make_rand_mat_1d(N,2);
+    b = make_rand_mat_1d(N,2);  
+    c = make_zero_mat_1d(N);
     
-    srand(time(NULL)); // generate rand seed from current time    
-
-    // initialize a and b with pseudo random numbers between 0 to 99
-    for (i = 0; i < N*N; i++) {
-        a[i] = rand() % 2;
-        b[i] = rand() % 2;
+    if(test_num > -1) {
+        run_test(tests[test_num], test_names[test_num], a, b, c, log_file, mat_size_mb);
+        printf("finished test\n",N_TESTS);     
     }
-
-    end = clock();
-    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("initialization took %f seconds\n", time_spent);
-  
-    printf("computing d = a*b with a serial calculating\n");
-    begin = clock();
-    tests[0](N, a, b, d);
-    end = clock();
-    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("finished computing d, in %f seconds\n", time_spent);
-    // run all tests with a,b,c and n
-    for(k = 0; k < N_TESTS; k++) {
-        printf("\ncomputing c = a*b with test: %s\n",test_names[k]);
-        begin = clock();
-        tests[k](N, a, b, c);
-        end = clock();
-        time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-        printf("finished test: %s, in %f seconds\n", test_names[k], time_spent);
-        printf("verifying that c == d\n");
-        int bad = 0;
-        for(i = 0; i < N*N; i++) {
-            int err = abs(c[i] - d[i]);
-            if(err > EPS) {
-                printf("BAD RSULTS in test: %s! err: %d i: %d j: %d\n",test_names[k],err,i,j);
-                printf("c[%d]: %d\n",i,c[i]);
-                printf("d[%d]: %d\n",i,d[i]);
-                break;
-            }
+    else {
+       // run all tests with a,b,c and N
+        for(test_num = 0; test_num < N_TESTS; test_num++) {
+            run_test(tests[test_num], test_names[test_num] , a, b, c, log_file, mat_size_mb);
         }
+        printf("finished %d tests\n",N_TESTS);    
     }
-        
+
+    fclose(log_file);
     free(a);
     free(b);
     free(c);
-    free(d);
     
     return 0;
 
 }
-    

@@ -6,6 +6,7 @@
         "limits.h": "c",
         "errno.h": "c",
         "mat_mul.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "stdlib.h": "c"
     }
 }

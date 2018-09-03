@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <omp.h>
+#include <utils.h>
 
 void print_mat(int n , int** mat) {
     int i,j;

@@ -1,6 +1,6 @@
 #include <mat_mul.h>
 
-void mat_mul(int n, int* a, int* b, int* c) {  
+void mat_mul(int* a, int* b, int* c) {  
     int i,j,k;
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
