@@ -1,0 +1,5 @@
+unknown[unknown] (safe_system_no_abort) Failed (ret: 1, sig: 0) for 'gcc -D__PIPS__ -D__HPFC__ -U__GNUC__ --std=gnu99  -Wall  \/home\/idanmos\/projects\/APtests\/dynamic_allocation\/mat_mul\.c  -c -o /dev/null'
+unknown[unknown] (check_input_file_syntax) 
+
+        C syntax errors in file /home/idanmos/projects/APtests/dynamic_allocation/mat_mul.c!
+

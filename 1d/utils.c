@@ -53,7 +53,7 @@ int* make_rand_mat_1d(int n, int max_val) {
     srand(time(NULL)); // generate rand seed from current time
     #pragma omp parallel for private(i) firstprivate (n)
     for (i = 0; i < n*n; i++) {
-        mat[i] = 1; //rand() % max_val;
+        mat[i] = rand() % max_val;
     }
     end = omp_get_wtime();
     printf("matrix initialization with random numbers took %lf seconds\n", end - begin);  

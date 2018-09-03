@@ -21,19 +21,6 @@ void run_test(test_type test, const char* test_name, int* a, int* b, int* c, FIL
     end = omp_get_wtime();
     printf("finished test: %s, in %lf seconds\n", test_name, end - start);
     fprintf(log_file, "\n%d,%s,%lf,V,%lf", N, test_name, end - start, mat_size_mb);
-    printf("\nA:\n");
-    for(i=0; i< N*N; i++){
-        printf(" %d ",a[i]);   
-    }
-    printf("\nB:\n");
-    for(i=0; i< N*N; i++){
-        printf(" %d ",b[i]);   
-    }
-    printf("\nC:\n");
-    for(i=0; i< N*N; i++){
-        printf(" %d ",c[i]);  
-    }
-    printf("\n");
 }
 
 
@@ -87,7 +74,7 @@ int main(int argc, char** argv) {
     
     if(test_num > -1) {
         run_test(tests[test_num], test_names[test_num], a, b, c, log_file, mat_size_mb);
-        printf("finished test\n",N_TESTS);     
+        printf("finished test %d\n",test_num);     
     }
     else {
        // run all tests with a,b,c and N
