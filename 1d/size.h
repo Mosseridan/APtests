@@ -1,1 +1,1 @@
-#define N 5000
+#define N 1000
