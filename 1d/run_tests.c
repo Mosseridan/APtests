@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
+#include <size.h>
 #include <utils.h>
 #include <mat_mul.h>
 #include <string.h>
