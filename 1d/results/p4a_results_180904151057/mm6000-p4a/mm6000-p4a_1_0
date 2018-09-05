@@ -1,0 +1,11 @@
+using mm6000-p4a_1_0.csv to log test results
+N is set to 6000
+each matrix takes 144.048 MB
+total usage of matrices a,b and c is 432.144000 MB
+matrix initialization with random numbers took 4.338566 seconds
+matrix initialization with random numbers took 4.171836 seconds
+matrix initialization with zeros took 0.000020 seconds
+
+computing c = a*b with test: mat_mul
+finished test: mat_mul, in 446.873769 seconds
+finished 1 tests

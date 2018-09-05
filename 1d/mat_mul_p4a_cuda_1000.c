@@ -38,11 +38,12 @@ P4A_accel_kernel_wrapper p4a_wrapper_mat_mul(int i, int j, int *a, int *b, int *
 P4A_accel_kernel p4a_kernel_mat_mul(int i, int j, int *a, int *b, int *c)
 {
    // Declared by Pass Outlining
-   int k;
+   int k, t;
    if (i<=999&&j<=999) {
       c[i*1000+j] = 0;
       for(k = 0; k <= 999; k += 1)
-         c[i*1000+j] += a[i*1000+k]*b[j*1000+k];
+         for(t = 0; t <= 99; t += 1)
+            c[i*1000+j] += a[i*1000+k]*b[j*1000+k];
    }
 }
 void p4a_launcher_mat_mul(int *a, int *b, int *c)

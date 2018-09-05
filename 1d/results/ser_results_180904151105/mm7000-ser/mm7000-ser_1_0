@@ -1,0 +1,11 @@
+using mm7000-ser_1_0.csv to log test results
+N is set to 7000
+each matrix takes 196.056 MB
+total usage of matrices a,b and c is 588.168000 MB
+matrix initialization with random numbers took 4.534161 seconds
+matrix initialization with random numbers took 4.498932 seconds
+matrix initialization with zeros took 0.000034 seconds
+
+computing c = a*b with test: mat_mul
+finished test: mat_mul, in 21283.142939 seconds
+finished 1 tests
